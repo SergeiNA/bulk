@@ -1,12 +1,59 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.7)
 
-project(bulk)
+if(NOT DEFINED ENV{TRAVIS_BUILD_NUMBER})
+    set(ENV{TRAVIS_BUILD_NUMBER} 777)
+endif()
 
-add_executable(bulk bulk.cpp observer.cpp command_handler.cpp)
+project(bulk VERSION 1.0.$ENV{TRAVIS_BUILD_NUMBER})
+set (bulk_files observer.h command_handler.h observer.cpp command_handler.cpp)
 
+add_executable(bulk bulk.cpp ${bulk_files})
+add_executable(test_bulk_regular test_bulk_regular.cpp ${bulk_files})
+add_executable(test_bulk_nested test_bulk_nested.cpp ${bulk_files})
 
-set_target_properties(bulk PROPERTIES
+find_package(Threads REQUIRED)
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+
+set_target_properties(bulk test_bulk_regular test_bulk_nested PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
+
+set_target_properties(test_bulk_regular test_bulk_nested PROPERTIES
+    COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+    INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
+)
+
+target_link_libraries(bulk
+    Threads::Threads
+)
+
+target_link_libraries(test_bulk_regular
+    Threads::Threads
+    ${Boost_LIBRARIES}
+)
+
+target_link_libraries(test_bulk_nested
+    Threads::Threads
+    ${Boost_LIBRARIES}
+)
+
+install(TARGETS bulk RUNTIME DESTINATION bin)
+
+set(CPACK_GENERATOR DEB)
+
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+
+set(CPACK_PACKAGE_CONTACT "SergeiNA at github.com")
+
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+include(CPack)
+
+enable_testing()
+
+add_test(regular_tests test_bulk_regular)
+add_test(nested_tests test_bulk_nested)

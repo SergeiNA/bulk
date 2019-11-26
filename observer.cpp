@@ -1,6 +1,15 @@
+/**
+ * @file observer.cpp
+ * @author SergeiNA (you@domain.com)
+ * @brief log_observer and terminal_observer method definition
+ * @version 1.0
+ * @date 2019-11-26
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 #include "observer.h"
-#include <fstream>
-#include <iostream>
 
 terminal_observer::terminal_observer(std::ostream& ofs):
     isBegin(true),os(ofs) {}
