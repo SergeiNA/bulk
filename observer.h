@@ -21,7 +21,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <string_view>
 
 /**
  * @brief Observer interface
@@ -30,8 +29,9 @@
  */
 class Observer {
 public:
-    virtual void bulk(std::string_view) = 0;
-    virtual void create(std::string_view)=0;
+//string_view
+    virtual void bulk(const std::string&) = 0;
+    virtual void create(const std::string&)=0;
     virtual void end()=0;
     virtual ~Observer() =default;
 };
@@ -48,14 +48,16 @@ public:
      * @brief display bulk: to stdout
      * 
      */
-    void create([[maybe_unused]]std::string_view) override;
+    // string_view
+    void create([[maybe_unused]]const std::string&) override;
     void end() override;
     /**
      * @brief display command to stdout
      * 
      * @param cmd command to display
      */
-    void bulk(std::string_view cmd) override;
+    // string_view
+    void bulk(const std::string& cmd) override;
 private:
     bool isBegin; ///< indicate start of printing to stdout
     std::ostream& os;
@@ -74,14 +76,15 @@ public:
      * 
      * @param t unix time in miliseconds
      */
-    void create(std::string_view t) override;
+    void create(const std::string& t) override;
     void end() override;
     /**
      * @brief write commands to file
      * 
      * @param cmd written command
      */
-    void bulk(std::string_view cmd) override;
+    // string_view
+    void bulk(const std::string& cmd) override;
 private:
     std::ofstream File_;
 };
