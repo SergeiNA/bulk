@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 project(bulk)
 
-add_executable(bulk bulk.cpp)
+add_executable(bulk bulk.cpp observer.cpp command_handler.cpp)
 
 
 set_target_properties(bulk PROPERTIES
