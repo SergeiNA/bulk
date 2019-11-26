@@ -21,6 +21,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <string_view>
 
 /**
  * @brief Observer interface
