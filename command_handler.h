@@ -27,7 +27,7 @@ enum class cmdState{
 class QueueCommand{
 public:
     QueueCommand():block_size_{100} {};
-    QueueCommand(size_t block_size):block_size_{block_size} {}
+    QueueCommand(size_t block_size):block_size_{block_size},nested(false) {}
 
     QueueCommand(const QueueCommand&)   = default;
     QueueCommand(QueueCommand&&)        = default;
@@ -49,7 +49,7 @@ public:
      * 
      */
     void notify();
-
+    void set_nested(bool nested_);
     bool empty(){
         return commands.empty();
     }
@@ -65,7 +65,8 @@ private:
     std::vector<std::unique_ptr<Observer>> subs; ///< contains subscribers
     std::vector<std::string> commands; ///< contsains commands
     std::vector<std::string> timestamps; ///< contsains timestamps
-    size_t block_size_;
+    size_t block_size_;///< max free block size (if not in block)
+    bool nested;///< indicate if commands in block
 };
 
 /**

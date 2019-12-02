@@ -14,7 +14,7 @@ void QueueCommand::addCommand(std::string cmd)
 {
     commands.emplace_back(std::move(cmd));
     timestamps.emplace_back(getUnixTime());
-    if (commands.size() == block_size_)
+    if (commands.size() == block_size_ && !nested)
     {
         notify();
     }
@@ -39,19 +39,22 @@ void QueueCommand::subscribe(std::unique_ptr<Observer> &&obs)
  */
 void QueueCommand::notify()
 {
-    if(commands.empty())
-        commands.emplace_back("queuery is empty");
-        timestamps.emplace_back("00000000000");
-
+    if(empty())
+        return;
     for (size_t i = 0; i < subs.size(); i++){
         subs[i]->create(timestamps.front());
         subs[i]->bulk(commands);
         subs[i]->end();
     }
+
     commands.clear();
     commands.resize(0);
     timestamps.clear();
     timestamps.resize(0);
+}
+
+void QueueCommand::set_nested(bool nested_){
+    nested = nested_;
 }
 
 std::string QueueCommand::getUnixTime()
@@ -90,6 +93,7 @@ void CommandHandler::process(std::string &&cmd)
         if (!isNested())
         {
             state = (size_t)cmdState::nested;
+            queueCmd_->set_nested(true);
             queueCmd_->notify();
         }
         ++braces_count;
@@ -102,6 +106,7 @@ void CommandHandler::process(std::string &&cmd)
         if (!braces_count)
         {
             state = (size_t)cmdState::regular;
+            queueCmd_->set_nested(false);
             queueCmd_->notify();
         }
     }
