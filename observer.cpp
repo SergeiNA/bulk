@@ -23,11 +23,13 @@ void terminal_observer::end() {
     os << std::endl;
 }
 //string_view
-void terminal_observer::bulk(const std::string& cmd)  {
-    if(!isBegin)
-        os << ", ";
-    isBegin =false;
-    os << cmd;
+void terminal_observer::bulk(const std::vector<std::string>& cmd)  {
+    for(const auto& c:cmd){
+        if (!isBegin)
+            os << ", ";
+        isBegin = false;
+        os << c;
+    }
 }
 
 log_observer::log_observer() {}
@@ -41,6 +43,7 @@ void log_observer::end(){
     File_.close();
 }
 //string_view
-void log_observer::bulk(const std::string& cmd){
-    File_ << cmd << std::endl;
+void log_observer::bulk(const std::vector<std::string>& cmd){
+    for(const auto& c:cmd)
+        File_ << c << std::endl;
 }

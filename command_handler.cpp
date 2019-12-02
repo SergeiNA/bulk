@@ -12,7 +12,8 @@
 
 void QueueCommand::addCommand(std::string cmd)
 {
-    commands.push(std::make_pair(std::move(cmd), getUnixTime()));
+    commands.emplace_back(std::move(cmd));
+    timestamps.emplace_back(getUnixTime());
     if (commands.size() == block_size_)
     {
         notify();
@@ -27,11 +28,11 @@ void QueueCommand::subscribe(std::unique_ptr<Observer> &&obs)
  * @brief Sent cmd message to all subscribers
  * 
  * First call initiate function (create)
- * then send all commands in the queue
- * until it becomes empty
+ * then send all commands as a packege
+ * to all subs
  * At the end call ending function (end)
  * 
- * Note: If command queue is empty 
+ * Note: If vector of commands is empty 
  * "queuery is empty" - will be send as command
  * and "empty" as a timestamp
  * 
@@ -39,18 +40,16 @@ void QueueCommand::subscribe(std::unique_ptr<Observer> &&obs)
 void QueueCommand::notify()
 {
     if(commands.empty())
-        commands.emplace("queuery is empty","empty");
-    for (size_t i = 0; i < subs.size(); i++)
-        subs[i]->create(commands.front().second);
+        commands.emplace_back("queuery is empty");
+        timestamps.emplace_back("00000000000");
 
-    while (!commands.empty())
-    {
-        for (size_t i = 0; i < subs.size(); i++)
-            subs[i]->bulk(commands.front().first);
-        commands.pop();
-    }
-    for (size_t i = 0; i < subs.size(); i++)
+    for (size_t i = 0; i < subs.size(); i++){
+        subs[i]->create(timestamps.front());
+        subs[i]->bulk(commands);
         subs[i]->end();
+    }
+    commands.clear();
+    timestamps.clear();
 }
 
 std::string QueueCommand::getUnixTime()
@@ -119,6 +118,8 @@ void CommandHandler::Run(std::istream &is = std::cin)
     {
         std::string temp;
         std::getline(is, temp);
+        if(temp.empty()&&is.eof())
+            break;
         process(std::move(temp));
     }
     dumpRemains();

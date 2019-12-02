@@ -21,6 +21,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 /**
  * @brief Observer interface
@@ -30,7 +31,7 @@
 class Observer {
 public:
 //string_view
-    virtual void bulk(const std::string&) = 0;
+    virtual void bulk(const std::vector<std::string>&) = 0;
     virtual void create(const std::string&)=0;
     virtual void end()=0;
     virtual ~Observer() =default;
@@ -57,7 +58,7 @@ public:
      * @param cmd command to display
      */
     // string_view
-    void bulk(const std::string& cmd) override;
+    void bulk(const std::vector<std::string>& cmd) override;
 private:
     bool isBegin; ///< indicate start of printing to stdout
     std::ostream& os;
@@ -84,7 +85,7 @@ public:
      * @param cmd written command
      */
     // string_view
-    void bulk(const std::string& cmd) override;
+    void bulk(const std::vector<std::string>& cmd) override;
 private:
     std::ofstream File_;
 };

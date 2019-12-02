@@ -12,7 +12,6 @@
  */
 #pragma once
 #include "observer.h"
-#include <queue>
 #include <vector>
 #include <utility>
 #include <chrono>
@@ -64,7 +63,8 @@ private:
 
 private:
     std::vector<std::unique_ptr<Observer>> subs; ///< contains subscribers
-    std::queue<std::pair<std::string, std::string>> commands; ///< contsains pair of command and timestamp
+    std::vector<std::string> commands; ///< contsains commands
+    std::vector<std::string> timestamps; ///< contsains timestamps
     size_t block_size_;
 };
 
