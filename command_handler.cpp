@@ -49,7 +49,9 @@ void QueueCommand::notify()
         subs[i]->end();
     }
     commands.clear();
+    commands.resize(0);
     timestamps.clear();
+    timestamps.resize(0);
 }
 
 std::string QueueCommand::getUnixTime()
